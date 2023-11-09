@@ -89,7 +89,6 @@ def kmeans_clustering(df, sc, n_clusters):
 
     return df
 
-
 def outstanding_players(df, n_clusters):
     best_cluster_id = None
     best_avg_comp_stat = 0
@@ -112,14 +111,14 @@ def outstanding_players(df, n_clusters):
     top_names = cluster_data[["firstname","lastname",]].head(20)
     print(top_names.to_string(index=False))
 
-
 sc = ["pts/g", "reb/g", "asts/g", "stl/g", "blk/g", "turnover/g", "pf/g", "fg_ratio", "ft_ratio", "tp_ratio"]
 n_clusters = 3
 
 df = preprocessing()
 
-elbow_plot(df, sc)
-silhouette_plot(df, sc)
+# Uncomment the next 2 lines to view the elbow and silhouette plots
+# elbow_plot(df, sc)
+# silhouette_plot(df, sc)
 
 df = kmeans_clustering(df, sc, n_clusters)
 
