@@ -89,6 +89,27 @@ def kmeans_clustering(df, sc, n_clusters):
 
     return df
 
+def outliers(df):
+    stats = df.describe()
+
+    iqr_multiplier = 1.5
+
+    for column in ['comp_stat', "pts/g", "reb/g", "asts/g", "stl/g", "blk/g"]:
+        q1 = stats.at['25%', column]
+        q3 = stats.at['75%', column]
+        iqr = q3 - q1
+        lower_bound = q1 - iqr_multiplier * iqr
+        upper_bound = q3 + iqr_multiplier * iqr
+
+        # Identify outliers
+        outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+
+        # Print the number of outliers and the firstname and lastname of outliers for the current column
+        num_outliers = len(outliers)
+
+        print(f'\nOutliers in {column}: {num_outliers} players')
+        print(outliers[['firstname', 'lastname']].to_string(index=False))
+
 def outstanding_players(df, n_clusters):
     best_cluster_id = None
     best_avg_comp_stat = 0
@@ -123,3 +144,5 @@ df = preprocessing()
 df = kmeans_clustering(df, sc, n_clusters)
 
 outstanding_players(df, n_clusters)
+
+outliers(df)
