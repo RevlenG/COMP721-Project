@@ -1,3 +1,4 @@
+# outstanding players and ouliers code
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -146,3 +147,137 @@ df = kmeans_clustering(df, sc, n_clusters)
 outstanding_players(df, n_clusters)
 
 outliers(df)
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------
+# game prediction code
+
+# import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Read in dataset
+matches = pd.read_csv(f'Dataset/Game Prediction/matches.txt', header=None, names=['VISITOR', 'VISITOR_PTS', 'HOME', 'HOME_PTS'])
+
+#Preprocess Dataset
+matches.dropna()
+matches.drop_duplicates(keep='first', inplace=True)
+matches['VISITOR'] = matches['VISITOR'].str.replace(' ', '_')
+matches['HOME'] = matches['HOME'].str.replace(' ', '_')
+matches['RESULT_(HOME_W/L)'] = np.where(matches['VISITOR_PTS']>matches['HOME_PTS'], 0, 1)
+
+# create array of teams in dataset
+array_visitor = matches['VISITOR']
+array_home = matches['HOME']
+array = []
+for x in array_visitor:
+    array.append(x)
+for y in array_home:
+    array.append(y)
+
+# clean array of teams in dataset and drop duplicate values
+df = pd.DataFrame(array, columns=['Teams'])
+df.drop_duplicates(keep='first', inplace=True)
+array_new = df['Teams']
+team=[]
+for x in array_new:
+    team.append(x)
+
+# create 2d array of team names and its respective integer label for logistic regression
+teams = []
+count = 0
+for z in team:
+    dummy = []
+    dummy.append(z)
+    dummy.append(count)
+    teams.append(dummy)
+    count = count + 1
+
+# print sample of teams with respective number
+print("Sample of Teams with Their Respective Number Allocations: ")
+print(teams[0:5])
+print("")
+# replace team names in dataset with its respective team value
+for x in range(0, 30):
+    # print(teams[x][0])
+    # print(teams[x][1])
+    team_replace = teams[x][0]
+    id = teams[x][1]
+
+    matches['VISITOR'].replace(team_replace, id, inplace=True)
+    matches['HOME'].replace(team_replace, id, inplace=True)
+
+# print(matches.head(6))
+
+# split dataset for training and testing
+X_train, X_test, y_train, y_test = train_test_split(matches[['VISITOR', 'HOME']], matches['RESULT_(HOME_W/L)'], test_size=0.2, random_state=2)
+
+# train and output the Logistic regression predictions
+logistic_reg = LogisticRegression()
+logistic_reg.fit(X_train, y_train)
+logistic_reg_accuracy = logistic_reg.score(X_test, y_test)
+logistic_reg_prediction = logistic_reg.predict(X_test)
+print("Logistic Regression Prediction Given Two Teams as as Tuple Input: ")
+print("")
+print(logistic_reg_prediction)
+print("")
+print("Logistic Regression Accuracy Score: ", logistic_reg_accuracy)
+print("")
+
+# train and output the Naive Bayes predictions and scores
+classifier = GaussianNB()  # Use Gaussian Naive Bayes classifier
+classifier.fit(X_train, y_train)
+naive_bayes_prediction= classifier.predict(X_test)
+accuracy = accuracy_score(y_test, naive_bayes_prediction)
+precision = precision_score(y_test, naive_bayes_prediction)
+recall = recall_score(y_test, naive_bayes_prediction)
+f1 = f1_score(y_test, naive_bayes_prediction)
+print("Naive Bayes Prediction Given Two Teams as as Tuple Input: ")
+print("")
+print(naive_bayes_prediction)
+print("")
+print("Naive Bayes Accuracy Score:", accuracy)
+print("Naive Bayes Precision Score:", precision)
+print("Naive Bayes Recall Score:", recall)
+print("Naive Bayes F1-Score:", f1)
+print("")
+
+# train and output the Decision Tree predictions and scores
+classifierr = DecisionTreeClassifier()  # Use Decision Tree classifier
+classifierr.fit(X_train, y_train)
+decision_tree_prediction = classifierr.predict(X_test)
+accuracyy = accuracy_score(y_test, decision_tree_prediction)
+precisionn = precision_score(y_test, decision_tree_prediction)
+recalll = recall_score(y_test, decision_tree_prediction)
+f11 = f1_score(y_test, decision_tree_prediction)
+print("Decision Tree Prediction Given Two Teams as as Tuple Input: ")
+print("")
+print(decision_tree_prediction)
+print("")
+print("Decision Tree Accuracy Score:", accuracyy)
+print("Decision Tree Precision Score:", precisionn)
+print("Decision Tree Recall Score:", recalll)
+print("Decision Tree F1-Score:", f11)
+print("")
+
+# Test on new data
+new_data = [(5, 21), (10, 3), (6, 9), (12, 2), (16, 6)] # each number represents a team, chosen at random
+new_data_test_lr = logistic_reg.predict(new_data)
+new_data_test_nb = classifier.predict(new_data)
+new_data_test_dt = classifierr.predict(new_data)
+print("Logistic Regression Prediction on New Data: ")
+print("")
+print(new_data_test_lr)
+print("")
+print("Naive Bayes Prediction on New Data: ")
+print("")
+print(new_data_test_nb)
+print("")
+print("Decision Tree Prediction on New Data: ")
+print("")
+print(new_data_test_dt)
+print("")
