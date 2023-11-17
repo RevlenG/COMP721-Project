@@ -161,7 +161,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Read in dataset
-matches = pd.read_csv(f'Dataset/Game Prediction/matches.txt', header=None, names=['VISITOR', 'VISITOR_PTS', 'HOME', 'HOME_PTS'])
+matches = pd.read_csv(f'/databasketball/matches.txt', header=None, names=['VISITOR', 'VISITOR_PTS', 'HOME', 'HOME_PTS'])
 
 #Preprocess Dataset
 matches.dropna()
